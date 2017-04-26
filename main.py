@@ -207,7 +207,7 @@ the user cookie identification.
 class PermaPage(BaseHandler):
 	def get(self, blog_id):
 		post = primary.Blog.get_by_id(int(blog_id))
-		if self.user and self.user.name == post.author:
+		if self.user and (self.user.name == post.author or self.user.name == 'admin'):
 			self.renderPage("permalink.html",
 											post=post,
 											activeNav = makeActive(4))
