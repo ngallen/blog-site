@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="row bnav">
+		<div class="col-xs-12">
+			<form method="post">
+
+				<div class="row">
+					<div class="col-xs-5 col-xs-offset-1 form-label">Subject</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-5 post-title col-xs-offset-1"><input type="text" name="blog-title" value="{{title}}"></div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-10 form-label col-xs-offset-1">Body</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-10 post-body col-xs-offset-1">
+						<textarea name="blog-body">{{body}}</textarea></div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-10 col-xs-offset-1 error">{{error}}</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-10 text-center col-xs-offset-1"><input type="submit" value="Post"></div>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

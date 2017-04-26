@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 	<link type="text/css" rel="stylesheet" href="/css/main.css" />
+ -->	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/main.css">
+<!-- 	<script type="text/javascript" src="js/bootstrap.min.js"></script> -->
+</head>
+
+	<title>Udacity FSD Project 3</title>
+</head>
+
+<body>
+	<div class="b-head">
+		<div class="container c-head">
+			<div class="row">
+				<div class="col-xs-6 main-title">
+					Udacity FSD Project 3
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-12">
+					<ul id="tabs" class="nav nav-tabs customNav" role="tablist">
+					  <li class="{{''.join(activeNav[0])}}"><a href="/blog">HOME</a></li>
+						<li class="{{''.join(activeNav[1])}}"><a href="/blog/newpost">NEWPOST</a></li>
+						{% if user %}
+							 <li><a href="/blog/logout">LOGOUT - {{user.name}} </a></li>
+						{% else %}
+							<li class="{{''.join(activeNav[2])}}"><a href="/blog/login">LOGIN</a></li>
+							<li class="{{''.join(activeNav[3])}}"><a href="/blog/signup">SIGNUP</a></li>
+						{% endif %}
+						{% if post %}
+							<li class="{{''.join(activeNav[4])}}"><a href="/blog/"{{post.key().id()}}>{{post.key().id()}}</a></li>
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="b-body">
+		<div class="container c-body">
+					{% block content %}
+					{% endblock %}
+		</div>
+	</div>
+
+
+
+</body>
+
+</html>
+

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<div class="row">
+		<div class="col-xs-10 col-xs-offset-1 bnav">
+			<form method="post">
+
+				<div class="row">
+					<div class="col-xs-4 text-right form-label">Username</div>
+					<div class="col-xs-4 text-left"><input type="text" name="username" value="{{username}}"></div>
+					<div class="col-xs-4 text-left error">{{error_username}}</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-4 text-right form-label">Password</div>
+					<div class="col-xs-4 text-left"><input type="password" name="password" value="{{password}}"></div>
+					<div class="col-xs-4 text-left error">{{error_password}}</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-4 text-right form-label">Verify Password</div>
+					<div class="col-xs-4 text-left"><input type="password" name="verify" value="{{verify}}"></div>
+					<div class="col-xs-4 text-left error">{{error_verify}}</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-4 text-right form-label">Email (optional)</div>
+					<div class="col-xs-4 text-left"><input type="text" name="email" value="{{email}}"></div>
+					<div class="col-xs-4 text-left error">{{error_email}}</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12 text-center"><input type="submit" value="Signup"></div>
+				</div>
+		</form>
+		</div>
+	</div>
+{% endblock %}

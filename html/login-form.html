@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-xs-10 col-xs-offset-1 bnav">
+			<form method="post">
+				<div class="row">
+					<div class="col-xs-4 text-right form-label">Username</div>
+					<div class="col-xs-4 text-left"><input type="text" name="username" value="{{username}}"></div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4 text-right form-label">Password</div>
+					<div class="col-xs-4 text-left"><input type="password" name="password" value=""></div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 text-center error">{{error}}</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 text-center"><input type="submit" value="Login"></div>
+				</div>
+		</form>
+		</div>
+	</div>
+{% endblock %}

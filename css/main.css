@@ -1,0 +1,112 @@
+div {
+/*  border: 1px solid red;*/
+}
+
+html, body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	height: 100%
+}
+
+.b-head {
+	background-color: #3C6994;
+}
+
+.b-body {
+	background-color: #EBEEF2;
+	height: 100%
+}
+
+.c-body{
+	background-color: #FFFFFF;
+	height: 100%
+}
+.container  {
+	width: 1000px;
+}
+
+.nav{
+	background-color: #304D66;
+	color: #C7CED5;
+}
+
+.nav-tabs>li>a {
+	color: #C7CED5;
+}
+
+.nav-tabs>li>a:hover, .nav>li>a:focus, .nav>li>a:hover {
+    border-color: transparent;
+    background-color: #435D74;
+    color: #C7CED5;
+}
+
+.main-title {
+	font-size: 40px;
+	line-height: 80px;
+	text-decoration: none;
+	font-weight: 300;
+	color: #FFFFFF;
+}
+
+.error {
+	color: red;
+	margin-top: 2%;
+}
+
+input[type=text], input[type=password]{
+	width: 100%;
+	font-size: 24px;
+	padding: 2px;
+	font-family: monospace;
+}
+
+.form-label {
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.bnav {
+	margin-top: 5%;
+}
+
+a {
+	color: black;
+}
+
+textarea {
+width: 100%;
+height: 400px;
+font-size: 17px;
+font-family: monospace;
+}
+
+input[type=submit] {
+font-size: 24px;
+margin-top: 10%;
+}
+
+.likeButton {
+	font-size: 12px;
+	width: 50%;
+	margin-top: 1%
+}
+
+.modButton {
+	margin-bottom: 10%
+}
+
+.post-title, .post-likes{
+	font-weight: bold;
+	font-size: 24px;
+}
+
+.post-created, .post-author {
+	color: gray;
+	font-size: 12px;
+}
+
+.post-body {
+/*	border-top: 1px solid black;*/
+/*	padding-top: 1%;*/
+	margin-bottom: 5%;
+}

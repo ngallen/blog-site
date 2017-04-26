@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-xs-10 col-xs-offset-1 error text-center">{{error}}</div>
+	</div>
+
+	{% set i = 0 %}
+	{% for p in posts: %}
+		{% set i = i + 1 %}
+		<div class="row bnav">
+			<div class="col-xs-5 post-title col-xs-offset-1"><a href="/blog/{{p.key().id()}}">{{ p.title}}</a></div>
+			<div class="col-xs-1 post-likes text-left">({{p.likes}})</div>
+			<div class="col-xs-1 text-center">
+				<form method="post" id="form{{i}}">
+					<input type="hidden" name="blogID" value="{{p.key().id()}}">
+				</form>
+					<button type="submit" form="form{{i}}" name="like" value="1" class="likeButton">+1</button>
+					<button type="submit" form="form{{i}}" name="like" value="-1" class="likeButton">-1</button>
+			</div>
+			<div class="col-xs-3">
+				<div class="row">
+					<div class="col-xs-12 post-created text-right">Created: {{ p.created}}</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 post-author text-center">By: {{ p.author}}</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+
+			<div class="col-xs-10 post-body col-xs-offset-1">
+				<hr>
+				{{p.body}}
+			</div>
+		</div>
+
+
+	{% endfor %}
+
+{% endblock %}
