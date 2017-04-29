@@ -9,6 +9,9 @@ handlers:
 - url: /blog/css
   static_dir: css
 
+- url: /blog/comment/css
+  static_dir: css
+
 - url: /blog/js
   static_dir: js
 

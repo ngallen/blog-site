@@ -13,8 +13,16 @@ class Blog(db.Model):
 	title = db.StringProperty(required=True)
 	body = db.TextProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add=True)
-	likes = db.IntegerProperty(default=0)
-	author = db.TextProperty()
+	likes = db.IntegerProperty(default=0, required = True)
+	author = db.TextProperty(required=True)
+	like_list = db.ListProperty(str, indexed=False,default=None)
+	comment_list = db.ListProperty(int, indexed=False,default=None)
+
+class Comment(db.Model):
+	author = db.TextProperty(required=True)
+	blogId = db.IntegerProperty(required = True)
+	created = db.DateTimeProperty(auto_now_add=True)
+	body = db.TextProperty(required = True)
 
 class User(db.Model):
 	name = db.StringProperty(required = True)

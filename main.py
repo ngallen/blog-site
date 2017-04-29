@@ -33,7 +33,7 @@ Renders html pages.
 Provides login/logout functions.
 """
 class BaseHandler(webapp2.RequestHandler):
-	def __init__(self, *a, **kw):
+	def initialize(self, *a, **kw):
 		webapp2.RequestHandler.initialize(self, *a, **kw)
 		uid = self.read_secure_cookie('user_id')
 		if uid:
@@ -71,32 +71,79 @@ Clicking on blog post subject line takes the user to the 'edit/delete'
 page only if the user ID matches the post author.
 """
 class MainPage(BaseHandler):
+	def __init__(self, *a, **kw):
+		self.initialize(*a, **kw)
+
 	def get(self):
 		posts = primary.db.GqlQuery("SELECT * FROM Blog ORDER BY created DESC")
 		error = self.request.get("error")
+		username = ''
+		if self.user:
+			username = self.user.name
 		self.renderPage("index.html",
-			posts=posts,
-			error=error,
-			activeNav = makeActive(0))
+										posts=posts,
+										error=error,
+										comments=self.getComments(posts),
+										likeButton = self.checkLikeButtons(posts),
+										username = username,
+										activeNav = makeActive(0))
 
 	def post(self):
 		error = ""
 		blogID = self.request.get('blogID')
+		com_entry = self.request.get('com-entry')
 		post = primary.Blog.get_by_id(int(blogID))
-		if self.user and self.user.name != post.author:
-			if int(self.request.get('like')) > 0:
+		postReq = self.request.get('postReq')
+		username = ''
+		if self.user:
+			username = self.user.name
+			if postReq == '1':
 				post.likes = post.likes +1
-			else:
+				post.like_list.append(username)
+			if postReq == '2':
 				post.likes = post.likes -1
+				post.like_list.append(username)
+			if postReq == '3':
+				if com_entry:
+					com = primary.Comment(author = username, body = com_entry, blogId = int(blogID))
+					com.put()
+					post.comment_list.append(int(com.key().id()))
+				else:
+					error = "must have a body in comment"
 			post.put()
 			time.sleep(0.2)
+			posts = primary.db.GqlQuery("SELECT * FROM Blog ORDER BY created DESC")
+			self.renderPage("index.html",
+											posts=posts,
+											comments=self.getComments(posts),
+											error=error,
+											likeButton=self.checkLikeButtons(posts),
+											username = username,
+											activeNav=makeActive(0))
 		else:
-			error = "you can't like your own post, that would be biased"
-		posts = primary.db.GqlQuery("SELECT * FROM Blog ORDER BY created DESC")
-		self.renderPage("index.html",
-										posts=posts,
-										error=error,
-										activeNav = makeActive(0))
+			self.redirect("/blog/signup")
+
+	def getComments(self, posts):
+		comments = []
+		for i in range(0, posts.count()):
+				clist = posts[i].comment_list
+				for j in range(0, len(clist)):
+					comments.append(primary.Comment.get_by_id(clist[j]))
+		return comments
+
+	def checkLikeButtons(self, posts):
+		username = ''
+		if self.user:
+			username = self.user.name
+
+		neverLiked = []
+		notAuthor = []
+		likeButton = []
+		for i in range(0, posts.count()):
+			neverLiked.append(not username in posts[i].like_list)
+			notAuthor.append(posts[i].author != username)
+			likeButton.append(notAuthor[i] and neverLiked[i])
+		return likeButton
 
 """Purpose: Redirects default loading page to /blog
 """
@@ -110,6 +157,9 @@ Username is checked for duplicates.
 Cookie is created to identify user.
 """
 class Signup(BaseHandler):
+	# def __init__(self, *a, **kw):
+	# 	self.__init__(self, *a, **kw)
+
 	def get(self):
 		self.renderPage("signup-form.html",
 										username="",
@@ -160,6 +210,9 @@ Functions: A valid cookie check is made to validate the user.
 If this check fails the user is sent to the signup page.
 """
 class Welcome(BaseHandler):
+	def __init__(self, *a, **kw):
+		self.initialize(*a, **kw)
+
 	def get(self):
 		if self.user:
 			self.renderPage('welcome.html',
@@ -174,6 +227,9 @@ Functions: Basic error checking.
 Stores blog post info in database.
 """
 class NewPost(BaseHandler):
+	def __init__(self, *a, **kw):
+		self.initialize(*a, **kw)
+
 	def render_newpost(self, title="", body="", error=""):
 		self.renderPage("newpost.html",
 										title=title,
@@ -205,6 +261,9 @@ Functions: Access is only allowed if the blog author field matches
 the user cookie identification.
 """
 class PermaPage(BaseHandler):
+	def __init__(self, *a, **kw):
+		self.initialize(*a, **kw)
+
 	def get(self, blog_id):
 		post = primary.Blog.get_by_id(int(blog_id))
 		if self.user and (self.user.name == post.author or self.user.name == 'admin'):
@@ -229,10 +288,12 @@ class PermaPage(BaseHandler):
 				self.redirect("/blog")
 			else:
 				self.renderPage("permalink.html",
-											post=post,
-											error = error,
-											activeNav = makeActive(4))
+												post=post,
+												error = error,
+												activeNav = makeActive(4))
 		else:
+			for c in post.comment_list:
+				primary.Comment.get_by_id(c).delete()
 			post.delete()
 			time.sleep(0.2)
 			self.redirect("/blog")
@@ -243,13 +304,15 @@ Cookie is activated if login info matches user info stored
 in database
 """
 class Login(BaseHandler):
+	def __init__(self, *a, **kw):
+		self.initialize(*a, **kw)
+
 	def get(self):
 		self.renderPage('login-form.html', activeNav = makeActive(2))
 
 	def post(self):
 		username = self.request.get('username')
 		password = self.request.get('password')
-
 		u = primary.User.login(username, password)
 		if u:
 			self.login(u)
@@ -264,9 +327,53 @@ class Login(BaseHandler):
 Functions: Sets the user ID cookie to None.
 """
 class Logout(BaseHandler):
+	def __init__(self, *a, **kw):
+		self.initialize(*a, **kw)
+
 	def get(self):
 		self.logout()
 		self.redirect('/blog/signup')
+
+"""Purpose: Comment edit page is used to edit/delete a comment.
+Functions: Access is only allowed if the comment author field matches
+the user cookie identification.
+"""
+class CommentPage(BaseHandler):
+	def __init__(self, *a, **kw):
+		self.initialize(*a, **kw)
+
+	def get(self, com_id):
+		com = primary.Comment.get_by_id(int(com_id))
+		if self.user and (self.user.name == com.author or self.user.name == 'admin'):
+			self.renderPage("commentPage.html",
+											comment=com,
+											activeNav = makeActive(4))
+		else:
+			self.redirect("/blog?error=Invalid user identity")
+
+	def post(self, com_id):
+		body = self.request.get("com-body")
+		com = primary.Comment.get_by_id(int(com_id))
+		error = "we need a comment body!"
+		action = self.request.get("action")
+		if action == "update":
+			if body:
+				com.body = body
+				com.put()
+				time.sleep(0.2)
+				self.redirect("/blog")
+			else:
+				self.renderPage("commentPage.html",
+												comment=com,
+												error = error,
+												activeNav = makeActive(4))
+		else:
+			com.delete()
+			post = primary.Blog.get_by_id(com.blogId)
+			post.comment_list.remove(int(com.key().id()))
+			post.put()
+			time.sleep(0.2)
+			self.redirect("/blog")
 
 app = webapp2.WSGIApplication([('/', RedirPage),
 															 ('/blog', MainPage),
@@ -275,5 +382,6 @@ app = webapp2.WSGIApplication([('/', RedirPage),
 															 ('/blog/login', Login),
 															 ('/blog/logout', Logout),
 															 ('/blog/newpost', NewPost),
-															 (r'/blog/(\d+)', PermaPage)],
+															 (r'/blog/(\d+)', PermaPage),
+															 (r'/blog/comment/(\d+)', CommentPage)],
 															debug=True)

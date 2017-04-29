@@ -1,0 +1,25 @@
+<!-- 		{% for c in p.comment_list: %}
+			{% set currComment = comments.pop() %}
+			<div class="row">
+				<div class="col-xs-3 com-det text-left col-xs-offset-6">
+					<div class="row">
+						<div class="col-xs-12 text-left">
+							{{currComment.created}}
+						</div>
+						<div class="col-xs-12 text-left">
+							{{currComment.author}} commented:
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-2 text-right com-det">
+					{% if currComment.author == username %}
+						<a class="com-editLink" href="/blog/comment/{{comments[j].key().id()}}">Edit</a>
+					{% endif %}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-5 com-body col-xs-offset-6 text-left">
+					{{currComment.body}}
+				</div>
+			</div>
+		{% endfor %} -->
