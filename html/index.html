@@ -36,7 +36,7 @@
 		</div>
 
 		{% for c in p.comment_list: %}
-			{% set currComment = comments.pop() %}
+			{% set currComment = comments.pop(0) %}
 			<div class="row">
 				<div class="col-xs-3 com-det text-left col-xs-offset-6">
 					<div class="row">

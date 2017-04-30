@@ -244,17 +244,20 @@ class NewPost(BaseHandler):
 			self.redirect("/blog/login")
 
 	def post(self):
-		title = self.request.get("blog-title")
-		body = self.request.get("blog-body")
+		if self.user:
+			title = self.request.get("blog-title")
+			body = self.request.get("blog-body")
 
-		if title and body:
-			newBlogPost = primary.Blog(title=title, body=body, likes=0, author = self.user.name)
-			newBlogPost.put()
+			if title and body:
+				newBlogPost = primary.Blog(title=title, body=body, likes=0, author = self.user.name)
+				newBlogPost.put()
 
-			self.redirect("/blog/"+str(newBlogPost.key().id()))
+				self.redirect("/blog/"+str(newBlogPost.key().id()))
+			else:
+				error = "we need both a title and a body!"
+				self.render_newpost(title, body, error)
 		else:
-			error = "we need both a title and a body!"
-			self.render_newpost(title, body, error)
+			self.redirect("/blog/login")
 
 """Purpose: Blog post perma page is used to edit/delete a post.
 Functions: Access is only allowed if the blog author field matches
@@ -277,25 +280,31 @@ class PermaPage(BaseHandler):
 		title = self.request.get("blog-title")
 		body = self.request.get("blog-body")
 		post = primary.Blog.get_by_id(int(blog_id))
-		error = "we need both a title and a body!"
-		action = self.request.get("action")
-		if action == "update":
-			if title and body:
-				post.title = title
-				post.body = body
-				post.put()
-				time.sleep(0.2)
-				self.redirect("/blog")
+		if self.user and post:
+			if self.user.name == post.author:
+				error = "we need both a title and a body!"
+				action = self.request.get("action")
+				if action == "update":
+					if title and body:
+						post.title = title
+						post.body = body
+						post.put()
+						time.sleep(0.2)
+						self.redirect("/blog")
+					else:
+						self.renderPage("permalink.html",
+														post=post,
+														error = error,
+														activeNav = makeActive(4))
+				else:
+					for c in post.comment_list:
+						primary.Comment.get_by_id(c).delete()
+					post.delete()
+					time.sleep(0.2)
+					self.redirect("/blog")
 			else:
-				self.renderPage("permalink.html",
-												post=post,
-												error = error,
-												activeNav = makeActive(4))
+				self.redirect("/blog")
 		else:
-			for c in post.comment_list:
-				primary.Comment.get_by_id(c).delete()
-			post.delete()
-			time.sleep(0.2)
 			self.redirect("/blog")
 
 """Purpose: Login class for returning user.
@@ -356,23 +365,26 @@ class CommentPage(BaseHandler):
 		com = primary.Comment.get_by_id(int(com_id))
 		error = "we need a comment body!"
 		action = self.request.get("action")
-		if action == "update":
-			if body:
-				com.body = body
-				com.put()
+		if com:
+			if action == "update":
+				if body:
+					com.body = body
+					com.put()
+					time.sleep(0.2)
+					self.redirect("/blog")
+				else:
+					self.renderPage("commentPage.html",
+													comment=com,
+													error = error,
+													activeNav = makeActive(4))
+			else:
+				com.delete()
+				post = primary.Blog.get_by_id(com.blogId)
+				post.comment_list.remove(int(com.key().id()))
+				post.put()
 				time.sleep(0.2)
 				self.redirect("/blog")
-			else:
-				self.renderPage("commentPage.html",
-												comment=com,
-												error = error,
-												activeNav = makeActive(4))
 		else:
-			com.delete()
-			post = primary.Blog.get_by_id(com.blogId)
-			post.comment_list.remove(int(com.key().id()))
-			post.put()
-			time.sleep(0.2)
 			self.redirect("/blog")
 
 app = webapp2.WSGIApplication([('/', RedirPage),
