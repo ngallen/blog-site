@@ -365,24 +365,27 @@ class CommentPage(BaseHandler):
 		com = primary.Comment.get_by_id(int(com_id))
 		error = "we need a comment body!"
 		action = self.request.get("action")
-		if com:
-			if action == "update":
-				if body:
-					com.body = body
-					com.put()
+		if com and user.self:
+			if user.self.name == com.author:
+				if action == "update":
+					if body:
+						com.body = body
+						com.put()
+						time.sleep(0.2)
+						self.redirect("/blog")
+					else:
+						self.renderPage("commentPage.html",
+														comment=com,
+														error = error,
+														activeNav = makeActive(4))
+				else:
+					com.delete()
+					post = primary.Blog.get_by_id(com.blogId)
+					post.comment_list.remove(int(com.key().id()))
+					post.put()
 					time.sleep(0.2)
 					self.redirect("/blog")
-				else:
-					self.renderPage("commentPage.html",
-													comment=com,
-													error = error,
-													activeNav = makeActive(4))
 			else:
-				com.delete()
-				post = primary.Blog.get_by_id(com.blogId)
-				post.comment_list.remove(int(com.key().id()))
-				post.put()
-				time.sleep(0.2)
 				self.redirect("/blog")
 		else:
 			self.redirect("/blog")
